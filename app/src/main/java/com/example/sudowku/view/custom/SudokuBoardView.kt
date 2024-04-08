@@ -1,4 +1,4 @@
-package com.example.sudowku
+package com.example.sudowku.view.custom
 
 import android.content.Context
 import android.graphics.Canvas
@@ -14,6 +14,7 @@ class SudokuBoardView(context: Context, attributeSet: AttributeSet): View(contex
     private var cellSizePixels = 0F
     private var selectedRow = 0
     private var selectedCol = 0
+    private var listener: SudokuBoardView.OnTouchListener? = null
     private val thickLinePaint = Paint().apply{
         style = Paint.Style.STROKE
         color = Color.BLACK
@@ -94,8 +95,19 @@ class SudokuBoardView(context: Context, attributeSet: AttributeSet): View(contex
         }
     }
     private fun handleTouchEvent(x: Float, y: Float){
-        selectedRow = (y / cellSizePixels).toInt()
-        selectedCol = (x / cellSizePixels).toInt()
+        val possibleSelectedRow= (y / cellSizePixels).toInt()
+        val possibleSelectedCol = (x / cellSizePixels).toInt()
+        listener?.onCellTouched(possibleSelectedRow,possibleSelectedCol)
+    }
+    fun updateSelectedCellUI(row: Int, col: Int){
+        selectedRow = row
+        selectedCol = col
         invalidate()
+    }
+    fun registerListener(listener: SudokuBoardView.OnTouchListener){
+        this.listener = listener
+    }
+    interface OnTouchListener{
+        fun onCellTouched(row: Int, col: Int)
     }
 }
