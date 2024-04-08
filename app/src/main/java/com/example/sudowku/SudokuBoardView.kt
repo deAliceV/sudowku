@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 
 class SudokuBoardView(context: Context, attributeSet: AttributeSet): View(context, attributeSet) {
@@ -81,5 +82,20 @@ class SudokuBoardView(context: Context, attributeSet: AttributeSet): View(contex
             )
 
         }
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        return when (event.action){
+            MotionEvent.ACTION_DOWN -> {
+                handleTouchEvent(event.x, event.y)
+                true
+            }
+            else->false
+        }
+    }
+    private fun handleTouchEvent(x: Float, y: Float){
+        selectedRow = (y / cellSizePixels).toInt()
+        selectedCol = (x / cellSizePixels).toInt()
+        invalidate()
     }
 }
