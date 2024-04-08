@@ -11,6 +11,8 @@ class SudokuBoardView(context: Context, attributeSet: AttributeSet): View(contex
     private var sqrtSize = 3
     private var size = 9
     private var cellSizePixels = 0F
+    private var selectedRow = 0
+    private var selectedCol = 0
     private val thickLinePaint = Paint().apply{
         style = Paint.Style.STROKE
         color = Color.BLACK
@@ -21,6 +23,14 @@ class SudokuBoardView(context: Context, attributeSet: AttributeSet): View(contex
         color = Color.BLACK
         strokeWidth = 3f
     }
+    private val selectedCellPaint = Paint().apply{
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.parseColor("#6ead3b")
+    }
+    private val conflictingCellPaint = Paint().apply{
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.parseColor("#efedef")
+    }
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int){
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val sizePixels = Math.min(widthMeasureSpec, heightMeasureSpec)
@@ -28,8 +38,25 @@ class SudokuBoardView(context: Context, attributeSet: AttributeSet): View(contex
     }
     override fun onDraw(canvas: Canvas){
         cellSizePixels = (width / size).toFloat()
-
+        fillCells(canvas)
         drawLines(canvas)
+    }
+    private fun fillCells(canvas: Canvas){
+        if(selectedRow == -1 || selectedCol == -1)return
+        for(r in 0..size){
+            for(c in 0..size){
+                if(r==selectedRow&&c==selectedCol){
+                    fillCell(canvas, r, c, selectedCellPaint)
+                }else if(r==selectedRow || c==selectedCol){
+                    fillCell(canvas, r, c, conflictingCellPaint)
+                }else if(r / sqrtSize == selectedRow / sqrtSize && c / sqrtSize == selectedCol / sqrtSize){
+                    fillCell(canvas, r, c, conflictingCellPaint)
+                }
+            }
+        }
+    }
+    private fun fillCell(canvas: Canvas, r: Int, c: Int, paint: Paint){
+        canvas.drawRect(c*cellSizePixels,r*cellSizePixels, (c+1)*cellSizePixels, (r + 1) * cellSizePixels, paint)
     }
     private fun drawLines(canvas: Canvas){
         canvas.drawRect(0F,0F, width.toFloat(), height.toFloat(), thickLinePaint)
